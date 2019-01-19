@@ -1,0 +1,43 @@
+body{
+	color:#330000;
+}
+
+h1{
+font-size:50px;
+font-family: "Georgia";
+}
+
+#buttona{
+	font-size:10px;
+	border-radius: 12px;
+	background-color: white;
+	border: 1px solid #339966;
+}
+
+#buttonb{
+	font-size:10px;
+	border-radius: 12px;
+	background-color: white;
+	border: 1px solid #e69900;
+}
+
+#squirrel{
+	float:left;
+	padding:20px;
+	border: solid 3px gold;
+	background-color:#555;
+	box-shadow: 10px 10px 5px #000;
+	border-radius: 20px;
+}
+
+#content{
+	border:solid 2px #08c;
+	border-radius:15px;
+	background-color:#333;
+	color:#8cc;
+	padding-left:20px;
+}
+
+.warning{
+	color:red;
+}

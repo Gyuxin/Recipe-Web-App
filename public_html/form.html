@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>recipes</title>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script language="javascript" type="text/javascript" src="../form.js"></script>
+</head>
+<body>
+	<h1> Choose your recipes </h1>
+
+		<fieldset>
+			<br/>
+			<label for="recipesSelect">9830Recipes:</label>
+			<select name="recipes" onchange = "viewRequest()" id="array"></select>
+			<br/>
+			<button onclick = "viewRequest()" id="buttona">View</button>
+			<button method="POST" onclick = "submitRequest()" id="buttonb">Submit</button>
+			            <div id = "greenCheck" style = "display:none;">
+			<img src="http://www.clker.com/cliparts/2/k/n/l/C/Q/transparent-green-checkmark-md.png"  width="15" height="15">
+			</div>
+			<hr/>
+			<form>
+				9658Duration:<br>
+				<textarea name="duration" rows="1" cols="25" id = "duration"></textarea></form><br>
+            <form>
+				9658Ingredients:<br>
+				<textarea name="ingredients" rows="4" cols="80" id = "ingredients"></textarea></form><br>
+			<form>
+				9658Steps:<br>
+				<textarea name="Steps" rows="6" cols="80" id = "Steps"></textarea></form><br>
+			<form>
+				9658Notes:<br>
+				<textarea name="Notes" rows="4" cols="50" id = "Notes"></textarea></form><br>
+
+		</br></fieldset>
+
+</body>
+</html>
