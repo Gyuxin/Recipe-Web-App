@@ -1,0 +1,31 @@
+doctype html
+head
+	title= recipes
+	link(rel="stylesheet", type="text/css", href="/style.css")
+	script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js")
+	script(src="/recipePage.js")
+body
+		h1 &#9829 Choose your recipes &#9829
+		fieldset
+			lable &#9830Recipes:
+			select#recipeSelect
+			br
+			button#recipeViewButton View
+			button(method="POST")#recipeSubmitButton Submit
+			div#confirmed Submit successful:)
+			hr
+			form &#9658Name:
+				br
+				textarea(rows="1" cols="25")#recipeName
+			form &#9658Duration:
+				br
+				textarea(rows="1" cols="25")#recipeDuration
+			form &#9658Ingredients:
+				br
+				textarea(rows="4" cols="80")#recipeIngredients
+			form &#9658Steps:
+				br
+				textarea(rows="6" cols="80")#recipeDirections
+			form &#9658Notes:
+				br
+				textarea(rows="4" cols="50")#recipeNotes

@@ -1,0 +1,31 @@
+body{
+	background-color:"white";
+	color:#330000;
+	font-size:20px;
+}
+
+h1{
+font-size:50px;
+font-family: "Georgia";
+}
+
+#recipeViewButton{
+	font-size:10px;
+	border-radius: 12px;
+	background-color: white;
+	border: 1px solid #339966;
+}
+
+#recipeSubmitButton{
+	font-size:10px;
+	border-radius: 12px;
+	background-color: white;
+	border: 1px solid #e69900;
+}
+#confirmed{
+	display:none;
+}
+
+.warning{
+	color:red;
+}
