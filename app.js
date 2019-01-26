@@ -1,99 +1,96 @@
-/*
-Author: Yuxin Gao
-Student Number: 101016814
-*/
+var express = require('express');
+var app = express();
+var mongo= require('mongodb').MongoClient;
+var bodyParser = require('body-parser');
 
-var http = require('http');
-var fs = require('fs');
-var mime = require ('mime-types');
-var url = require ('url');
-const ROOT = "./public_html";
+var DBURL="mongodb://localhost:27017/recipeDB";     //R3.1
 
-//create http server
-var server = http.createServer(handleRequest);
-server.listen(2406);
-//Create array of file names that under recipes dictionary
-var array = fs.readdirSync(ROOT+"/recipes",'utf8');
-console.log('Server listening on port 2406');
+var list={names:[]};
 
-function handleRequest(req,res){
+app.set('views','./views');
+app.set('view engine','pug');
 
-	//process the request
-	console.log(req.method+"request for: "+req.url);
-	//parse the url
-	var urlObj = url.parse(req.url,true);
-	var filename = ROOT+urlObj.pathname;
+//logger
+app.use(function(req,res,next){
+	console.log(req.method+" request for "+req.url);
+	next();
+});
 
-	if(urlObj.pathname==="/recipes"){
-		var parse_data = {filename:[],jsonfile:[]}
-		var name_array = []
-		for(var i=1;i<array.length;i++){
-			var data=fs.readFileSync(ROOT+"/recipes/"+array[i], 'utf8');
-			name_array.push(JSON.parse(data));
-		}
-		parse_data.jsonfile = name_array;
-		parse_data.filename = array;
-	  respond(200,JSON.stringify(parse_data));
-	}else if(req.method==="POST"){//this post request(from line 33-42) is cited from course code
-		var postBody="";
+//display main inventory sheet overview
+app.get(['/', '/index.html', '/home', '/index'],function(req,res){         //R1.1
+				res.render('index',{});
+});
 
-		req.setEncoding('utf8');
-		req.on('data',function(chunk){
-		    postBody+=chunk; //data is read as buffer objects
+app.get("/recipes",function(req,res){                      //R1.2
+	mongo.connect(DBURL,function(err,db){
+	    var cursor = db.collection("recipes").find({},{name:1,_id:0});
+			var arr = [];
+        cursor.each(function(err,document){
+			if(document!=null){
+			arr.push(document.name);
+			list.names = arr;
+			}
+			if(document == null){
+					res.send(list);
+				db.close();
+			}
+        });
+		});
 		});
 
-		req.on('end', function() {
-		fs.writeFileSync(filename, postBody);
-		});
 
-	}else if(urlObj.pathname==="/recipes/"){
-		json_file_name = urlObj.search.substr(8);
-		var data=fs.readFileSync(ROOT+"/recipes/"+json_file_name, 'utf8');
-		respond(200,data);
-	}else{
-		fs.stat(filename,function(err,stats){
+app.get("/recipe/*",function(req,res){              //R1.3
+	var cursor;
+	mongo.connect(DBURL,function(err,db){
 		if(err){
-			respondErr(err)
-		}else if(stats.isDirectory()){
-			fs.readdir(filename,function(err,files){
-				if(err)respondErr(err);
-				else respond(200,files.join("<br/>"));
-			});
-		}else{
-			fs.readFile(filename,"utf8",function(err,data){
-				if(err)respondErr(err);
-				else respond(200,data);
-			});
+			res.sendStatus(404);                          //R1.4
 		}
+		else{
+   db.collection("recipes").findOne({name:req.url.slice(8,req.url.indexOf("?")).replace(/%20/g," ")})
+   .then(function(cursor){
+		console.log(cursor);
+		res.send(cursor);
+		 });
+	 }
+});
+});
+
+app.use('/recipe',bodyParser.urlencoded({extended:true}));   //R1.5
+//app.use('/recipe',bodyParser.json());
+app.post("/recipe",function(req,res){
+
+	mongo.connect(DBURL,function(err,db){
+		if(err){
+			res.sendStatus(500);
+		}
+		else if(req.body.name.length===0){                      //R1.6
+			res.sendStatus(400);
+		}
+		else{
+			console.log("POST SUCCESS");
+			if(list.names.indexOf(req.body.name)<0){              //R1.7
+				db.collection("recipes").insert(req.body);   //do not have it in the list
+			}
+			else{
+			console.log(req.body);
+			db.collection("recipes").update(
+				{name:req.body.name},
+				{
+					name:req.body.name,
+				  duration:req.body.duration,
+					ingredients:req.body.ingredients,
+					directions:req.body.directions,
+					notes:req.body.notes
+			  }
+			);
+		}
+					res.sendStatus(200);
+	}
 	});
-	}
+});
 
-	//locally defined helper function
-	//serves 404 files
-	function serve404(){
-		fs.readFile(ROOT+"/404.html","utf8",function(err,data){ //async
-			if(err)respond(500,err.message);
-			else respond(404,data);
-		});
-	}
 
-	//locally defined helper function
-	//responds in error, and outputs to the console
-	function respondErr(err){
-		console.log("Handling error: ",err);
-		if(err.code==="ENOENT"){
-			serve404();
-		}else{
-			respond(500,err.message);
-		}
-	}
 
-	//locally defined helper function
-	//sends off the response message
-	function respond(code, data){
-		// content header
-		res.writeHead(code, {'content-type': mime.lookup(filename)|| 'text/html'});
-		// write message and signal communication is complete
-		res.end(data);
-	}
-};//end handle request
+//static server for non-pug files
+app.use(express.static("./public"));                     //R1.1
+app.listen(2406,function(){console.log("Server listening on port 2406");});
